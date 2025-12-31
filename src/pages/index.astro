@@ -24,7 +24,7 @@ const totalPages = Math.ceil(posts.length / PAGE_SIZE)
 		<ul class="space-y-4">
 			{pagePosts.map((post) => ( 
 				<li>
-					<a href={`/til/${post.slug}`} class="block bg-card border border-border rounded-xl p-5 hover:shadow-sm transition hover:no-underline">
+					<a href={`/blog/til/${post.slug}`} class="block bg-card border border-border rounded-xl p-5 hover:shadow-sm transition hover:no-underline">
 						<h3 class="font-semibold text-lg mb-2">{post.data.title}</h3>
 
 						<div class="flex items-center gap-2 text-sm text-muted">
