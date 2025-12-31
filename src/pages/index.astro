@@ -1,16 +1,66 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro"
+import { getCollection } from "astro:content";
+import { site } from "../config/site";
+import { PAGE_SIZE } from "../config/pagination";
 
+const posts = await getCollection('til')
+posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const pagePosts = posts.slice(0, PAGE_SIZE)
+const totalPages = Math.ceil(posts.length / PAGE_SIZE)
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout>
+	
+	<!-- Content -->
+	<section>
+		<div class="flex justify-between items-center mb-4">
+			<h2 class="text-sm tracking-widest text-muted font-semibold">
+				My Latest Writing
+			</h2>
+		</div>
+
+		<ul class="space-y-4">
+			{pagePosts.map((post) => ( 
+				<li>
+					<a href={`/til/${post.slug}`} class="block bg-card border border-border rounded-xl p-5 hover:shadow-sm transition hover:no-underline">
+						<h3 class="font-semibold text-lg mb-2">{post.data.title}</h3>
+
+						<div class="flex items-center gap-2 text-sm text-muted">
+							{post.data.tags && (
+								<span class="px-2 py-0.5 rounded-md bg-gray-100 text-gray-700">
+									{post.data.tags[0]}
+								</span>
+							)}
+							<span>•</span>
+							<time>{post.data.date.toDateString()}</time>
+						</div>
+					</a>
+				</li>
+			))}
+		</ul>
+	</section>
+	<!-- Content -->
+
+	<!-- Pagination -->
+    <nav class="flex justify-between items-center mt-12 text-sm">
+      <span class="opacity-40">← Newer</span>
+
+      <span>
+        Page 1 of {totalPages}
+      </span>
+
+      {totalPages > 1 ? (
+        <a
+          href="/page/2"
+          class="text-gray-600 hover:text-gray-900"
+        >
+          Older →
+        </a>
+      ) : (
+        <span class="opacity-40">Older →</span>
+      )}
+    </nav>
+	<!-- Pagination -->
+</BaseLayout>

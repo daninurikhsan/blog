@@ -1,0 +1,112 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import Toc from "../../components/Toc.astro";
+export async function getStaticPaths () {
+    const posts = await getCollection("til");
+
+    return posts.map((post, index) => ({
+        params: {slug: post.slug},
+        props: {
+            post,
+            prev: posts[index + 1] ?? null,
+            next: posts[index - 1] ?? null
+        }
+    }));
+}
+
+const {post, prev, next} = Astro.props;
+const {Content, headings} = await post.render();
+
+const {
+    title,
+    author,
+    date,
+    tags
+} = post.data
+
+---
+
+<BaseLayout title={title}>
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_16rem] gap-12">
+        <article>
+            <!-- Tags -->
+            {tags && (
+                <div class="flex gap-2 mb-4">
+                    {tags.map((tag) => (
+                        <span class="px-3 py-1 bg-blue-50 rounded-full text-gray-700 text-md font-medium">{tag}</span>
+                    ))}
+                </div>
+            )}
+            <!-- Tags -->
+    
+            <!-- Title -->
+            <h1 class="text-4xl font-bold leading-tight mb-4">
+                {title}
+            </h1>
+            <!-- Title -->
+            
+            <!-- Meta -->
+            <div class="flex items-center gap-3 text-md text-gray-500 mb-8">
+                <img src="https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png" alt={author.name} class="w-8 h-8 rounded-full"/>
+    
+                <span>{author.name}</span>
+                <span></span>
+                <time>{date.toDateString()}</time>
+            </div>
+            <!-- Meta -->
+            
+            <!-- Hero Image -->
+            <!-- Hero Image -->
+
+            <!-- Mobile ToC -->
+            <div class="lg:hidden mb-10">
+                <Toc headings={headings} />
+            </div>
+            <div
+                class="
+                prose prose-lg max-w-none
+                prose-img:w-full prose-img:max-w-full
+                prose-h2:scroll-mt-24
+                prose-h3:scroll-mt-24
+                
+                "
+            >
+            </div>
+            <!-- Mobile ToC -->
+    
+            <!-- Content -->
+            <div class="prose prose-lg max-w-none
+                prose-blog
+                prose-img:w-full
+                prose-img:max-w-full
+                prose-p:text-justify
+                prose-p:[hyphens:auto]">
+                <Content/>
+            </div>
+            <!-- Content -->
+    
+            <!-- Pagination -->
+            <nav class="flex justify-between items-center mt-16 text-sm">
+                {prev ? (
+                    <a href={`/til/${prev.slug}`} class="text-gray-600 hover:text-gray-900">
+                        ← {prev.data.title}
+                    </a>
+                ) : <span/>}
+    
+                {next ? (
+                    <a href={`/til/${next.slug}`} class="text-gray-600 hover:text-gray-900">
+                        {next.data.title} →
+                    </a>
+                ) : <span/>}
+            </nav>
+            <!-- Pagination -->
+        </article>
+
+        <!-- Desktop TOC -->
+        <aside class="hidden lg:block sticky top-24 self-start">
+            <Toc headings={headings} />
+        </aside>
+        <!-- Desktop TOC -->
+    </div>
+</BaseLayout>
